@@ -19,7 +19,7 @@
 	<name>kafka-multi-node-cluster</name>
 	<description>Demo project for Apache Kafka with multi-node cluster based on Docker Compose</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
