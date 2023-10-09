@@ -21,7 +21,7 @@ class EmbeddedKafkaIntegrationTest {
   @Autowired
   private KafkaProducer producer;
 
-  @Value("${test.topic}")
+  @Value("${topic}")
   private String topic;
 
 

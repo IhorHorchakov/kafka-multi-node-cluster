@@ -11,7 +11,7 @@ public class KafkaConsumer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 
-  @KafkaListener(topics = "${test.topic}")
+  @KafkaListener(topics = "${topic}")
   public void receive(ConsumerRecord<?, ?> consumerRecord) {
     LOGGER.info("received payload='{}'", consumerRecord.toString());
     Object payload = consumerRecord.value();
