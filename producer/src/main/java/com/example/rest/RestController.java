@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller("/producer")
 @Slf4j
-public class ProducerController {
-
+public class RestController {
     @Autowired
     private KafkaProducer kafkaProducer;
 
