@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class KafkaConsumer {
+    private static final String TOPIC = "test-topic";
 
-    @KafkaListener(topics = "test-topic")
+    @KafkaListener(topics = TOPIC, groupId = KafkaConsumerConfig.CONSUMER_GROUP, containerFactory = "kafkaListenerContainerFactory")
     public void receive(ConsumerRecord<?, ?> consumerRecord) {
-        log.info("Received payload='{}'", consumerRecord.toString());
-        Object payload = consumerRecord.value();
+        log.info("Received a record '{}'", consumerRecord);
     }
 }
