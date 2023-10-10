@@ -12,7 +12,7 @@ public class KafkaProducer {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void send(Object payload) {
+    public void publish(Object payload) {
         log.info("Sending payload='{}' to topic='{}'", payload, TOPIC);
         kafkaTemplate.send(TOPIC, payload);
     }
