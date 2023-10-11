@@ -28,6 +28,9 @@ KAFKA_LISTENER_SECURITY_PROTOCOL_MAP – defines key/value pairs for the securit
 
 KAFKA_ADVERTISED_LISTENERS – makes Kafka accessible from outside the container by advertising its location on the Docker host.
 
+
+It is essential to ensure that service names and the KAFKA_BROKER_ID are distinct for each service. Additionally, each service should have a unique port exposed to the host machine. For instance, while zookeeper listens port 2181, it is exposed to the host through ports 22181, respectively. Similarly, the broker-1, broker-2, and broker-3 services are listening ports 19092, 19093, and 19094, respectively.
+
 -----
 Useful links:
 
