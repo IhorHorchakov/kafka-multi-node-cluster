@@ -8,8 +8,13 @@ For proof-of-concept or non-critical development work, a single-node cluster wor
 * **Geographical distribution**: If we want to have Kafka brokers in different geographical locations, we can set up a multi-broker cluster to handle data replication and ensure that data is available even if one location goes down.
 
 In real-world scenarios we will need more resilient setup to have redundancy for both the zookeeper servers and the Kafka brokers. 
-In this project I created setup with 1 Zookeeper and 3 Kafka Brokers:
+In this project I've created setup with 1 Zookeeper and 3 Kafka Brokers:
 
-![The topology of cluster](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/master/img/kafka-cluster.png?raw=true)
+![The topology of cluster](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-cluster.png?raw=true)
 
+-----
+Useful links:
 
+https://howtodoinjava.com/kafka/apache-kafka-tutorial/
+
+https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
