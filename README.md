@@ -13,6 +13,22 @@ In this project I've created setup with 1 Zookeeper and 3 Kafka Brokers:
 ![The topology of cluster](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-cluster.png?raw=true)
 
 -----
+
+Environment properties used in the configuration:
+
+KAFKA_BROKER_ID – The broker.id property is the unique and permanent name of each node in the cluster.
+
+KAFKA_AUTO_CREATE_TOPICS_ENABLE – If the value is true then it allows brokers to create topics when they’re first referenced by the producer or consumer. If the value is set to false, the topic should be first created using the Kafka command and then used.
+
+KAFKA_ZOOKEEPER_CONNECT – instructs Kafka how to contact Zookeeper.
+
+KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR – is required when we are running with a single-node cluster. If you have three or more nodes, we can use the default.
+
+KAFKA_LISTENER_SECURITY_PROTOCOL_MAP – defines key/value pairs for the security protocol to use per listener name.
+
+KAFKA_ADVERTISED_LISTENERS – makes Kafka accessible from outside the container by advertising its location on the Docker host.
+
+-----
 Useful links:
 
 https://howtodoinjava.com/kafka/apache-kafka-tutorial/
