@@ -7,13 +7,27 @@ For proof-of-concept or non-critical development work, a single-node cluster wor
 * **Replication**: Kafka replicates data across multiple brokers to ensure that data is not lost in the event of a broker failure. With multiple brokers, we can set a replication factor of more than one, which means that multiple copies of each message are stored across different brokers. This way, if one broker goes down, the data can still be retrieved from another broker.
 * **Geographical distribution**: If we want to have Kafka brokers in different geographical locations, we can set up a multi-broker cluster to handle data replication and ensure that data is available even if one location goes down.
 
-In real-world scenarios we will need more resilient setup to have redundancy for both the zookeeper servers and the Kafka brokers. 
+Management of the brokers in the cluster is performed by Zookeeper. There may be multiple Zookeepers in a cluster, in fact the recommendation is **three to five**, keeping an odd number so that there is always a majority and the number as low as possible to conserve overhead resources.
+
 In this project I've created setup with 1 Zookeeper and 3 Kafka Brokers:
 
 ![The topology of cluster](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-cluster.png?raw=true)
 
 -----
+Kafka Topic
 
+-----
+Topic partition
+
+-----
+Consumers and consumer groups
+https://codingharbour.com/apache-kafka/what-is-a-consumer-group-in-kafka/
+
+-----
+Replication factor, Partition count
+https://www.conduktor.io/kafka/kafka-topics-choosing-the-replication-factor-and-partitions-count/
+
+-----
 Environment properties used in the configuration:
 
 KAFKA_BROKER_ID – The broker.id property is the unique and permanent name of each node in the cluster.
@@ -33,6 +47,7 @@ It is essential to ensure that service names and the KAFKA_BROKER_ID are distinc
 
 -----
 Useful links:
+https://www.cloudkarafka.com/blog/part1-kafka-for-beginners-what-is-apache-kafka.html
 
 https://howtodoinjava.com/kafka/apache-kafka-tutorial/
 
