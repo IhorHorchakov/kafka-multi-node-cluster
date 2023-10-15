@@ -9,7 +9,7 @@ For proof-of-concept or non-critical development work, a single-node cluster wor
 
 Management of the brokers in the cluster is performed by Zookeeper. There may be multiple Zookeepers in a cluster, in fact the recommendation is **three to five**, keeping an odd number so that there is always a majority and the number as low as possible to conserve overhead resources.
 
-In this project I've created setup with 1 Zookeeper and 3 Kafka Brokers:
+In this project I've created setup with 1 Zookeeper and 3 Kafka Brokers. A single topic `test-topic` is created with 4 partitions and 3 replicas.
 
 ![The topology of cluster](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-cluster.png?raw=true)
 
@@ -31,7 +31,6 @@ The order guaranteed per partition. If partitioning by key then all records for 
 
 ![Topic Partition Layout and Offsets](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-topic-partition-layout-offsets.png?raw=true)
 
-
 -----
 **Replication, Fault tolerance, In-Sync Replicas**
 
@@ -48,8 +47,9 @@ In other words, the ISR is a group of stable replicas that didn't have lags and 
 
 The ISR acts as a tradeoff between availability and latency. As a producer, if we don't want to lose a message, we'd make sure that the message has been replicated to all replicas before receiving an acknowledgment. But this is problematic as the loss or slowdown of a single replica could cause a partition to become unavailable or add extremely high latencies. So the goal to be able to tolerate one or more replicas being lost or being very slow.
 
+![Topic metadata by kcat](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafkacat-topic-metadata.png?raw=true)
 -----
-**Producers, ack-value**
+**Producers, acknowledgments**
 
 Kafka uses an asynchronous publish/subscribe model. When your producer calls the send() command, the result returned is a future. If you do not use a future, you could get just one record, wait for the result, and then send a response. Latency is very low, but so is throughput.
 When you use Producer.send(), you fill up buffers on the producer. When a buffer is full, the producer sends the buffer to the Kafka broker and begins to refill the buffer.
@@ -60,7 +60,7 @@ A producer must know which partition to write to, this is not up to the broker. 
 
 A common error when publishing records is setting the same key or null key for all records, which results in all records ending up in the same partition and you get an unbalanced topic.
 
-An acknowledgment (`ACK`) is a signal passed between communicating processes to signify acknowledgment, i.e., receipt of the message sent. The ack-value is a producer configuration parameter in Apache Kafka and can be set to the following values:
+An acknowledgment (`acks`) is a signal passed between communicating processes to signify acknowledgment, i.e., receipt of the message sent. The ack-value is a producer configuration parameter in Apache Kafka and can be set to the following values:
 
 * acks=0 The producer never waits for an acknowledgment from the broker. No guarantee can be made that the broker has received the message. This setting provides lower latency and higher throughput at the cost of much higher risk of message loss.
 * acks=1 The producer gets an ack after the leader has received the record and respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
@@ -68,6 +68,7 @@ An acknowledgment (`ACK`) is a signal passed between communicating processes to 
 
 -----
 **Consumers, consumer groups, fail-over**
+
 A consumer group is a group of consumers that share the same group id. Consumers in the same consumer group split the partitions among them. This way you can ensure parallel processing of records from a topic.
 When a new consumer is started it will join a consumer group (this happens under the hood) and Kafka will then ensure that each partition is consumed by only one consumer from that group.
 
@@ -78,7 +79,7 @@ If you have more consumers in a group than you have partitions, extra consumers 
 
 If there is a need to consume the same record from multiple consumers, it is possible as long as that consumers have different groups.
 
-fail-over:
+_Fail-over behaviour:_
 
 Consumers notify the Kafka broker when they have successfully processed a record, which advances the offset.
 
