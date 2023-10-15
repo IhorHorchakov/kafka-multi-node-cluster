@@ -51,6 +51,9 @@ The ISR acts as a tradeoff between availability and latency. As a producer, if w
 -----
 **Producers, ack-value**
 
+Kafka uses an asynchronous publish/subscribe model. When your producer calls the send() command, the result returned is a future. If you do not use a future, you could get just one record, wait for the result, and then send a response. Latency is very low, but so is throughput.
+When you use Producer.send(), you fill up buffers on the producer. When a buffer is full, the producer sends the buffer to the Kafka broker and begins to refill the buffer.
+
 When a producer publishes a record to a topic, it is published to its leader. The leader appends the record to its commit log and increments its record offset. Kafka only exposes a record to a consumer after it has been “committed”. And the record is considered “committed” depending on the `ACK` property.
 
 A producer must know which partition to write to, this is not up to the broker. It's possible for the producer to attach a key to the record dictating the partition the record should go to. All records with the same key will arrive at the same partition. Before a producer can send any records, it has to request metadata about the cluster from the broker. The metadata contains information on which broker is the leader for each partition and a producer always writes to the partition leader. The producer then uses the key to know which partition to write to, the default implementation is to use the hash of the key to calculate partition, you can also skip this step and specify partition yourself.
