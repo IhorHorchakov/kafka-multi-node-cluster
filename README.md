@@ -33,31 +33,35 @@ The order guaranteed per partition. If partitioning by key then all records for 
 
 
 -----
-**Replication, Fault tolerance, ISRs**
+**Replication, Fault tolerance, In-Sync Replicas**
 
 In Kafka, replication is implemented at the partition level. The redundant unit of a partition is called a replica. 
 
 Kafka can replicate partitions across a configurable number of Kafka servers which is used for **fault tolerance**. Fault tolerance is a property of a system to make data available even in the case of some failures. 
 
-Each partition has a leader server and zero or more follower servers. Leaders handle all read and write requests for a partition.
-If the lead server fails, one of the follower servers becomes the leader by default. You should strive to have a good balance of leaders so each broker is a leader of an equal amount of partitions to distribute the load.
+Each partition has a leader broker and zero or more follower brokers. Leaders handle all read and write requests for a partition.
+If the lead broker fails, one of the follower ISR brokers becomes the leader by default. You should strive to have a good balance of leaders so each broker is a leader of an equal amount of partitions to distribute the load.
+We can specify a number of all partition replicas (leader replica + follower replicas) that has to be created for the topic using the **Replication factor** property.
 
+Followers replicate data from the leader to themselves by sending Fetch Requests periodically, by default every 500ms. That's why some replicas are fully caught up / synchronized with the leader(**in-sync replicas**), and some replicas are not synchronized. In-sync replicas(ISR) will consist of the leader replica and any additional follower replicas that are also considered in-sync.
+In other words, the ISR is a group of stable replicas that didn't have lags and were in-sync with leader replica during some fixed period of time `replica.lag.time.max.ms` (10 seconds by default)
 
-ISRs
-
-http://cloudurable.com/blog/kafka-architecture-topics/index.html
-https://www.conduktor.io/kafka/kafka-topics-choosing-the-replication-factor-and-partitions-count/
-
-
+The ISR acts as a tradeoff between availability and latency. As a producer, if we don't want to lose a message, we'd make sure that the message has been replicated to all replicas before receiving an acknowledgment. But this is problematic as the loss or slowdown of a single replica could cause a partition to become unavailable or add extremely high latencies. So the goal to be able to tolerate one or more replicas being lost or being very slow.
 
 -----
-**Producers**
+**Producers, ack-value**
 
-When a producer publishes a record to a topic, it is published to its leader. The leader appends the record to its commit log and increments its record offset. Kafka only exposes a record to a consumer after it has been committed and each piece of data that comes in will be stacked on the cluster.
+When a producer publishes a record to a topic, it is published to its leader. The leader appends the record to its commit log and increments its record offset. Kafka only exposes a record to a consumer after it has been “committed”. And the record is considered “committed” depending on the `ACK` property.
 
 A producer must know which partition to write to, this is not up to the broker. It's possible for the producer to attach a key to the record dictating the partition the record should go to. All records with the same key will arrive at the same partition. Before a producer can send any records, it has to request metadata about the cluster from the broker. The metadata contains information on which broker is the leader for each partition and a producer always writes to the partition leader. The producer then uses the key to know which partition to write to, the default implementation is to use the hash of the key to calculate partition, you can also skip this step and specify partition yourself.
 
 A common error when publishing records is setting the same key or null key for all records, which results in all records ending up in the same partition and you get an unbalanced topic.
+
+An acknowledgment (`ACK`) is a signal passed between communicating processes to signify acknowledgment, i.e., receipt of the message sent. The ack-value is a producer configuration parameter in Apache Kafka and can be set to the following values:
+
+* acks=0 The producer never waits for an acknowledgment from the broker. No guarantee can be made that the broker has received the message. This setting provides lower latency and higher throughput at the cost of much higher risk of message loss.
+* acks=1 The producer gets an ack after the leader has received the record and respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
+* acks=all The producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
 
 -----
 **Consumers and consumer groups**
