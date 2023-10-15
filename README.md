@@ -93,22 +93,9 @@ Tuning performance - latency and throughput
 https://docs.cloudera.com/documentation/kafka/1-4-x/topics/kafka_performance.html
 
 -----
-Environment properties used in the configuration:
-
-KAFKA_BROKER_ID – The broker.id property is the unique and permanent name of each node in the cluster.
-
-KAFKA_AUTO_CREATE_TOPICS_ENABLE – If the value is true then it allows brokers to create topics when they’re first referenced by the producer or consumer. If the value is set to false, the topic should be first created using the Kafka command and then used.
-
-KAFKA_ZOOKEEPER_CONNECT – instructs Kafka how to contact Zookeeper.
-
-KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR – is required when we are running with a single-node cluster. If you have three or more nodes, we can use the default.
-
-KAFKA_LISTENER_SECURITY_PROTOCOL_MAP – defines key/value pairs for the security protocol to use per listener name.
-
-KAFKA_ADVERTISED_LISTENERS – makes Kafka accessible from outside the container by advertising its location on the Docker host.
-
-
-It is essential to ensure that service names and the KAFKA_BROKER_ID are distinct for each service. Additionally, each service should have a unique port exposed to the host machine. For instance, while zookeeper listens port 2181, it is exposed to the host through ports 22181, respectively. Similarly, the broker-1, broker-2, and broker-3 services are listening ports 19092, 19093, and 19094, respectively.
+When Kafka looses data:
+* When asks = 1 and a broker with leader replica is getting break down before record-commit
+* When asks = all and broker with leader replica fails and no in-sync replicas present to take a leadership
 
 -----
 Useful links:
