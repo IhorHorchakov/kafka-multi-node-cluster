@@ -68,7 +68,7 @@ An acknowledgment (`ACK`) is a signal passed between communicating processes to 
 
 -----
 **Consumers, consumer groups, fail-over**
-A consumer group is a group of consumers that share the same group id. When a topic is consumed by consumers in the same group, every record will be delivered to only one consumer. This way you can ensure parallel processing of records from a topic.
+A consumer group is a group of consumers that share the same group id. Consumers in the same consumer group split the partitions among them. This way you can ensure parallel processing of records from a topic.
 When a new consumer is started it will join a consumer group (this happens under the hood) and Kafka will then ensure that each partition is consumed by only one consumer from that group.
 
 So, if you have a topic with two partitions and only one consumer in a group, that consumer would consume records from both partitions.
