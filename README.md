@@ -64,12 +64,27 @@ An acknowledgment (`ACK`) is a signal passed between communicating processes to 
 * acks=all The producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
 
 -----
-**Consumers and consumer groups**
+**Consumers, consumer groups, fail-over**
+A consumer group is a group of consumers that share the same group id. When a topic is consumed by consumers in the same group, every record will be delivered to only one consumer. This way you can ensure parallel processing of records from a topic.
+When a new consumer is started it will join a consumer group (this happens under the hood) and Kafka will then ensure that each partition is consumed by only one consumer from that group.
 
-https://codingharbour.com/apache-kafka/what-is-a-consumer-group-in-kafka/
+So, if you have a topic with two partitions and only one consumer in a group, that consumer would consume records from both partitions.
+After another consumer joins the same group, each consumer would continue consuming only one partition.
+
+If you have more consumers in a group than you have partitions, extra consumers will sit idle, since all the partitions are taken. If you know that you will need many consumers to parallelize the processing, then plan accordingly with the number of partitions.
+
+If there is a need to consume the same record from multiple consumers, it is possible as long as that consumers have different groups.
+
+fail-over:
+
+Consumers notify the Kafka broker when they have successfully processed a record, which advances the offset.
+
+If a consumer fails before sending commit offset to Kafka broker, then a different consumer can continue from the last committed offset.
+
+If a consumer fails after processing the record but before sending the commit to the broker, then some Kafka records could be reprocessed. In this scenario, Kafka implements the at least once behavior, and you should make sure the messages (record deliveries ) are idempotent.
 
 -----
-Performance
+Tuning performance - latency and throughput 
 
 https://docs.cloudera.com/documentation/kafka/1-4-x/topics/kafka_performance.html
 
