@@ -57,9 +57,9 @@ When you use Producer.send():
 * the producer passes the message to a configured list of **Interceptors**,
 * **Serializers** convert record key and value to byte arrays,
 * default or configured **Partitioner** calculates topic partition if none is specified,
-* the **Record Accumulator** appends the message to producer batches using a configured compression algorithm.
+* the **Record Accumulator** appends the message to producer batches using a configured compression algorithm. Batching is mainly controlled by two producer settings - `linger.ms` and `batch.size`. If a batch reaches its maximum size before the end of the linger.ms period, it will be sent to Kafka right away!
 
-At this point, the message is still in memory and not sent to the Kafka broker. When a buffer is full, the sender thread publishes the buffer to the Kafka broker and begins to refill the buffer.
+At this point, if a message size is less then `batch.size`, the message is still in memory and not sent to the Kafka broker. When a buffer is full, the sender thread publishes the buffer to the Kafka broker and begins to refill the buffer.
 
 When a producer publishes a record to a topic, it is published to its leader. The leader appends the record to its commit log and increments its record offset. Kafka only exposes a record to a consumer after it has been “committed”. And the record is considered “committed” depending on the `ACK` property.
 A producer must know which partition to write to, this is not up to the broker. It's possible for the producer to attach a key to the record dictating the partition the record should go to. All records with the same key will arrive at the same partition. Before a producer can send any records, it has to request metadata about the cluster from the broker. The metadata contains information on which broker is the leader for each partition and a producer always writes to the partition leader. The producer then uses the key to know which partition to write to, the default implementation is to use the hash of the key to calculate partition, you can also skip this step and specify partition yourself.
