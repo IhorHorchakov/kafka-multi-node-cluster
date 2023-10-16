@@ -52,10 +52,16 @@ The ISR acts as a tradeoff between availability and latency. As a producer, if w
 **Producers, acknowledgments**
 
 Kafka uses an asynchronous publish/subscribe model. When your producer calls the send() command, the result returned is a future. If you do not use a future, you could get just one record, wait for the result, and then send a response. Latency is very low, but so is throughput.
-When you use Producer.send(), you fill up buffers on the producer. When a buffer is full, the producer sends the buffer to the Kafka broker and begins to refill the buffer.
+
+When you use Producer.send():
+* the producer passes the message to a configured list of **Interceptors**,
+* **Serializers** convert record key and value to byte arrays,
+* default or configured **Partitioner** calculates topic partition if none is specified,
+* the **Record Accumulator** appends the message to producer batches using a configured compression algorithm.
+
+At this point, the message is still in memory and not sent to the Kafka broker. When a buffer is full, the sender thread publishes the buffer to the Kafka broker and begins to refill the buffer.
 
 When a producer publishes a record to a topic, it is published to its leader. The leader appends the record to its commit log and increments its record offset. Kafka only exposes a record to a consumer after it has been “committed”. And the record is considered “committed” depending on the `ACK` property.
-
 A producer must know which partition to write to, this is not up to the broker. It's possible for the producer to attach a key to the record dictating the partition the record should go to. All records with the same key will arrive at the same partition. Before a producer can send any records, it has to request metadata about the cluster from the broker. The metadata contains information on which broker is the leader for each partition and a producer always writes to the partition leader. The producer then uses the key to know which partition to write to, the default implementation is to use the hash of the key to calculate partition, you can also skip this step and specify partition yourself.
 
 A common error when publishing records is setting the same key or null key for all records, which results in all records ending up in the same partition and you get an unbalanced topic.
@@ -65,6 +71,8 @@ An acknowledgment (`acks`) is a signal passed between communicating processes to
 * acks=0 The producer never waits for an acknowledgment from the broker. No guarantee can be made that the broker has received the message. This setting provides lower latency and higher throughput at the cost of much higher risk of message loss.
 * acks=1 The producer gets an ack after the leader has received the record and respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
 * acks=all The producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
+
+https://blog.developer.adobe.com/exploring-kafka-producers-internals-37411b647d0f
 
 -----
 **Consumers, consumer groups, fail-over**
