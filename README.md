@@ -47,7 +47,7 @@ In other words, the ISR is a group of stable replicas that didn't have lags and 
 
 The ISR acts as a tradeoff between availability and latency. As a producer, if we don't want to lose a message, we'd make sure that the message has been replicated to all replicas before receiving an acknowledgment. But this is problematic as the loss or slowdown of a single replica could cause a partition to become unavailable or add extremely high latencies. So the goal to be able to tolerate one or more replicas being lost or being very slow.
 
-![Topic metadata by kcat](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafkacat-topic-metadata.png?raw=true)
+![Topic metadata by Kafdrop](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafdrop-topic-metadata.png?raw=true)
 -----
 **Producers, acknowledgments**
 

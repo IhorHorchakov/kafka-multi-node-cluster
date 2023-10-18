@@ -10,7 +10,7 @@ services:
     ports:
       - "22181:2181"
     networks:
-      - kafka-multi-node-cluster-network
+      - application-network
 
   broker-1:
     image: confluentinc/cp-kafka:latest
@@ -27,7 +27,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker-1:9092,EXTERNAL://localhost:19092
     networks:
-      - kafka-multi-node-cluster-network
+      - application-network
 
   broker-2:
     image: confluentinc/cp-kafka:latest
@@ -44,7 +44,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker-2:9092,EXTERNAL://localhost:19093
     networks:
-      - kafka-multi-node-cluster-network
+      - application-network
 
   broker-3:
     image: confluentinc/cp-kafka:latest
@@ -61,7 +61,23 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker-3:9092,EXTERNAL://localhost:19094
     networks:
-      - kafka-multi-node-cluster-network
+      - application-network
+        
+  kafdrop:
+    container_name: kafdrop
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    depends_on:
+      - broker-1
+      - broker-2
+      - broker-3
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: broker-1:9092, broker-2:9092, broker-3:9092
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+    networks:
+      - application-network
 
   producer:
     container_name: producer
@@ -73,7 +89,7 @@ services:
     build:
       context: producer
     networks:
-      - kafka-multi-node-cluster-network
+      - application-network
 
   consumer:
     container_name: consumer
@@ -83,8 +99,8 @@ services:
     build:
       context: consumer
     networks:
-      - kafka-multi-node-cluster-network
+      - application-network
 
 networks:
-  kafka-multi-node-cluster-network:
+  application-network:
       driver: bridge
