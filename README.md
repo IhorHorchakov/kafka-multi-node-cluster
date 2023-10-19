@@ -30,7 +30,6 @@ Kafka uses partitions to scale a topic across many servers for producer writes. 
 The order guaranteed per partition. If partitioning by key then all records for the key will be on the same partition which is useful if you ever have to replay the log. Kafka can replicate partitions to multiple brokers for **failover**.
 
 ![Topic Partition Layout and Offsets](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-topic-partition-layout-offsets.png?raw=true)
-
 -----
 **Replication, Fault tolerance, In-Sync Replicas**
 
@@ -72,8 +71,6 @@ An acknowledgment (`acks`) is a signal passed between communicating processes to
 * acks=1 The producer gets an ack after the leader has received the record and respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
 * acks=all The producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
 
-https://blog.developer.adobe.com/exploring-kafka-producers-internals-37411b647d0f
-
 -----
 **Consumers, consumer groups, fail-over**
 
@@ -96,21 +93,21 @@ If a consumer fails before sending commit offset to Kafka broker, then a differe
 If a consumer fails after processing the record but before sending the commit to the broker, then some Kafka records could be reprocessed. In this scenario, Kafka implements the at least once behavior, and you should make sure the messages (record deliveries ) are idempotent.
 
 -----
-Tuning performance - latency and throughput 
-
-https://docs.cloudera.com/documentation/kafka/1-4-x/topics/kafka_performance.html
-
------
 When Kafka looses data:
 * When asks = 1 and a broker with leader replica is getting break down before record-commit
 * When asks = all and broker with leader replica fails and no in-sync replicas present to take a leadership
 
 -----
 Useful links:
+
 https://www.cloudkarafka.com/blog/part1-kafka-for-beginners-what-is-apache-kafka.html
 
 http://cloudurable.com/blog/kafka-architecture-topics/index.html
 
-https://howtodoinjava.com/kafka/apache-kafka-tutorial/
+https://howtodoinjava.com/kafka/apache-kafka-tutorial
 
-https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+https://blog.developer.adobe.com/exploring-kafka-producers-internals-37411b647d0f
+
+https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc
+
+https://docs.cloudera.com/documentation/kafka/1-4-x/topics/kafka_performance.html
