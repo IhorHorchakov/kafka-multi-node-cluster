@@ -1,6 +1,6 @@
 **Kafka multi-node cluster setup using docker compose**
 
-### Intro
+## Intro
 This project is created to play with Kafka and Docker configuration, debug and learn more about Kafka internals.
 
 
@@ -17,17 +17,16 @@ In this project I've created setup with 1 Zookeeper and 3 Kafka Brokers. A singl
 
 ![The topology of cluster](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-cluster.png?raw=true)
 
-### Theory
+## Theory
 
 **Kafka Topic**
 
 A stream of messages that are a part of a specific category or feed name is referred to as a Kafka topic. In Kafka, data is stored in the form of topics. Producers write their data to topics, and consumers read the data from these topics.
 
 The topic is a distributed commit log to which records append and stored. Kafka topics are multi-subscriber. Records published to the cluster stay in the cluster(topic) until a configurable _retention period_ has passed by.
-
 Kafka stores records in the topic making the consumers responsible for tracking the position in the log, known as the “offset”. Typically, a consumer advances the offset in a linear manner as messages are read. However, the position is actually controlled by the consumer, which can consume messages in any order. For example, a consumer can reset to an older offset when reprocessing records.
 
------
+
 **Parallel processing and Fail-over**
 
 Kafka breaks topic into partitions. A record is stored on a partition usually by record key if the key is present and round-robin if the key is missing (default behavior). The record key, by default, determines which partition a producer sends the record.
@@ -38,7 +37,6 @@ The order guaranteed per partition. If partitioning by key then all records for 
 
 ![Topic Partition Layout and Offsets](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-topic-partition-layout-offsets.png?raw=true)
 
----
 **Replication, Fault tolerance, In-Sync Replicas**
 
 In Kafka, replication is implemented at the partition level. The redundant unit of a partition is called a replica. 
@@ -56,7 +54,7 @@ The ISR acts as a tradeoff between availability and latency. As a producer, if w
 
 ![Topic metadata by Kafdrop](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafdrop-topic-metadata.png?raw=true)
 
----
+
 **Producers, acknowledgments**
 
 The producers send data directly to the broker that plays the role of leader for a given partition. In order to help the producer send the messages directly, 
@@ -88,7 +86,7 @@ An acknowledgment (`acks`) is a signal passed between communicating processes to
 * acks=1 The producer gets an ack after the leader has received the record and respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
 * acks=all The producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
 
----
+
 **Consumers, consumer groups, fail-over**
 
 The consumer has to send requests to the brokers indicating the partitions it wants to consume. The consumer is required to specify its offset in the request 
@@ -117,13 +115,12 @@ If a consumer fails before sending commit offset to Kafka broker, then a differe
 
 If a consumer fails after processing the record but before sending the commit to the broker, then some Kafka records could be reprocessed. In this scenario, Kafka implements the at least once behavior, and you should make sure the messages (record deliveries ) are idempotent.
 
----
-When Kafka looses data:
+
+### When Kafka looses data ?
 * When asks = 1 and a broker with leader replica is getting break down before record-commit
 * When asks = all and broker with leader replica fails and no in-sync replicas present to take a leadership
 
----
-Useful links:
+### Useful links
 
 https://www.cloudkarafka.com/blog/part1-kafka-for-beginners-what-is-apache-kafka.html
 
