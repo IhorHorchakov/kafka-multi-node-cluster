@@ -38,7 +38,7 @@ The order guaranteed per partition. If partitioning by key then all records for 
 
 ![Topic Partition Layout and Offsets](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-topic-partition-layout-offsets.png?raw=true)
 
------
+---
 **Replication, Fault tolerance, In-Sync Replicas**
 
 In Kafka, replication is implemented at the partition level. The redundant unit of a partition is called a replica. 
@@ -56,7 +56,7 @@ The ISR acts as a tradeoff between availability and latency. As a producer, if w
 
 ![Topic metadata by Kafdrop](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafdrop-topic-metadata.png?raw=true)
 
------
+---
 **Producers, acknowledgments**
 
 The producers send data directly to the broker that plays the role of leader for a given partition. In order to help the producer send the messages directly, 
@@ -88,7 +88,7 @@ An acknowledgment (`acks`) is a signal passed between communicating processes to
 * acks=1 The producer gets an ack after the leader has received the record and respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
 * acks=all The producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
 
------
+---
 **Consumers, consumer groups, fail-over**
 
 The consumer has to send requests to the brokers indicating the partitions it wants to consume. The consumer is required to specify its offset in the request 
@@ -117,12 +117,12 @@ If a consumer fails before sending commit offset to Kafka broker, then a differe
 
 If a consumer fails after processing the record but before sending the commit to the broker, then some Kafka records could be reprocessed. In this scenario, Kafka implements the at least once behavior, and you should make sure the messages (record deliveries ) are idempotent.
 
------
+---
 When Kafka looses data:
 * When asks = 1 and a broker with leader replica is getting break down before record-commit
 * When asks = all and broker with leader replica fails and no in-sync replicas present to take a leadership
 
------
+---
 Useful links:
 
 https://www.cloudkarafka.com/blog/part1-kafka-for-beginners-what-is-apache-kafka.html
