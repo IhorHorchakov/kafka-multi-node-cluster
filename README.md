@@ -21,8 +21,6 @@ In this project I've created setup with 1 Zookeeper and 3 Kafka Brokers. A singl
 
 **Kafka Topic**
 
-A stream of messages that are a part of a specific category or feed name is referred to as a Kafka topic. In Kafka, data is stored in the form of topics. Producers write their data to topics, and consumers read the data from these topics.
-
 The topic is a distributed commit log to which records append and stored. Kafka topics are multi-subscriber. Records published to the cluster stay in the cluster(topic) until a configurable _retention period_ has passed by.
 Kafka stores records in the topic making the consumers responsible for tracking the position in the log, known as the “offset”. Typically, a consumer advances the offset in a linear manner as messages are read. However, the position is actually controlled by the consumer, which can consume messages in any order. For example, a consumer can reset to an older offset when reprocessing records.
 
