@@ -116,11 +116,11 @@ If a consumer fails before sending commit offset to Kafka broker, then a differe
 If a consumer fails after processing the record but before sending the commit to the broker, then some Kafka records could be reprocessed. In this scenario, Kafka implements the at least once behavior, and you should make sure the messages (record deliveries ) are idempotent.
 
 
-### When Kafka looses data ?
+#### When Kafka looses data ?
 * When asks = 1 and a broker with leader replica is getting break down before record-commit
 * When asks = all and broker with leader replica fails and no in-sync replicas present to take a leadership
 
-### Useful links
+#### Useful links
 
 https://www.cloudkarafka.com/blog/part1-kafka-for-beginners-what-is-apache-kafka.html
 
