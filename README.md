@@ -86,6 +86,9 @@ An acknowledgment (`acks`) is a signal passed between communicating processes to
 * acks=1 The producer gets an ack after the leader has received the record and respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
 * acks=all The producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
 
+ When Kafka looses data ?
+* When asks = 1 and a broker with leader replica is getting break down before record-commit
+* When asks = all and broker with leader replica fails and no in-sync replicas present to take a leadership
 
 **Consumers, consumer groups, fail-over**
 
@@ -121,7 +124,7 @@ To efficiently handle large volumes of data, Kafka performs compression of messa
 For the reason that Apache Kafka supports an efficient batching format, a batch of messages can be compressed together and sent to the server in this format. 
 The batch of messages here get written to the broker in a compressed format and continue to remain compressed in the log until they are extracted and decompressed by the consumer.
 
-#### Apache Kafka Use Cases
+## Apache Kafka Use Cases
 
 **Message broker && inter-service communication**
 
@@ -149,11 +152,8 @@ Kafka can be used as an external commit-log for a distributed application. Kafka
 In addition, Kafka can also be used as a centralized repository for log files from multiple data sources and in cases where there is distributed data consumption. 
 In such cases, data can be collected from physical log files of servers and from numerous sources and made available in a single location.
 
-#### When Kafka looses data ?
-* When asks = 1 and a broker with leader replica is getting break down before record-commit
-* When asks = all and broker with leader replica fails and no in-sync replicas present to take a leadership
-
-#### Useful links
+---
+###### Useful links
 
 https://www.cloudkarafka.com/blog/part1-kafka-for-beginners-what-is-apache-kafka.html
 
