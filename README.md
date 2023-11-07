@@ -115,6 +115,39 @@ If a consumer fails before sending commit offset to Kafka broker, then a differe
 
 If a consumer fails after processing the record but before sending the commit to the broker, then some Kafka records could be reprocessed. In this scenario, Kafka implements the at least once behavior, and you should make sure the messages (record deliveries ) are idempotent.
 
+**Batch Compression**
+
+To efficiently handle large volumes of data, Kafka performs compression of messages. Efficient compression involves compressing multiple messages together instead of compressing individual messages. 
+For the reason that Apache Kafka supports an efficient batching format, a batch of messages can be compressed together and sent to the server in this format. 
+The batch of messages here get written to the broker in a compressed format and continue to remain compressed in the log until they are extracted and decompressed by the consumer.
+
+#### Apache Kafka Use Cases
+
+**Message broker && inter-service communication**
+
+Kafka serves as an excellent replacement for traditional message brokers. Compared to traditional massage brokers, Apache Kafka provides better throughput and is capable of handling a larger volume of messages. 
+Kafka can be used as a publish-subscribe messaging service and is a good tool for large-scale message processing applications.
+
+**Tracking Website Activities**
+
+The activity associated with a website, that includes metrics like page views, searches, and other actions that users take, is published to a centralized topic which in turn contains a topic for each type of activity. 
+This data can be further used for real-time processing, real-time monitoring, and loading into the Hadoop Ecosystem for processing in the future. Website activity usually involves a very high volume of 
+data as several messages are generated for page views by a single user.
+
+**Monitoring metrics / centralized feeds**
+
+Kafka finds applications in monitoring the metrics associated with operational data. Statistics from distributed applications are consolidated into centralized feeds to monitor their metrics.
+
+**Event Sourcing**
+
+Event sourcing refers to an application design that involves logging state changes as a sequence of records ordered based on time.
+Kafka’s ability to store large logs make it a great choice for event sourcing applications.
+
+**Logging**
+
+Kafka can be used as an external commit-log for a distributed application. Kafka’s replication feature can help replicate data between multiple nodes and allow re-syncing in failed nodes for data restoration when required. 
+In addition, Kafka can also be used as a centralized repository for log files from multiple data sources and in cases where there is distributed data consumption. 
+In such cases, data can be collected from physical log files of servers and from numerous sources and made available in a single location.
 
 #### When Kafka looses data ?
 * When asks = 1 and a broker with leader replica is getting break down before record-commit
