@@ -117,13 +117,25 @@ If you have more consumers in a group than you have partitions, extra consumers 
 
 If there is a need to consume the same record from multiple consumers, it is possible as long as that consumers have different groups.
 
-**Fail-over behaviour**
+**Fail-over behaviour, edge cases**
 
+-Producer fails:
+Depending on the settings, the producer waits for the end of recording in the Kafka cluster and a confirmation message in response. If the producer was unable to record the message, he can try to send the message again - and so on in a circle.
+For Retriable errors kafka has inbuilt producer properties to enable retry behavior . With appropriate properties set when sending data to broker failed due to retriable error , kafka client automatically do retry based on our configuration
+
+-Consumer fails: 
 Consumers notify the Kafka broker when they have successfully processed a record, which advances the offset.
-
 If a consumer fails before sending commit offset to Kafka broker, then a different consumer can continue from the last committed offset.
-
 If a consumer fails after processing the record but before sending the commit to the broker, then some Kafka records could be reprocessed. In this scenario, Kafka implements the at least once behavior, and you should make sure the messages (record deliveries ) are idempotent.
+
+- Kafka broker:
+If kafka broker goes down the behaviour depends on configuration: min.insync.replicas, default.replication.factor, unclean.leader.election.enable.
+If the offline broker was a leader, a new leader is elected from the follower replicas that are in-sync. If no replicas are in-sync it will only elect an out of sync replica if unclean.leader.election.enable is true, otherwise the partition will be offline.
+
+If the offline broker was a follower, then nothing happens, it will be marked a out-of-sync by the leader.
+
+When restarting the broker, it will try to get back in sync. Once done, whether it stays a follower or becomes the leader depends if it is the prefered replica.
+Finally, if you know a broker will be offline for a long time and still require a replica, you can use the reassignment tool kafka-reassign-partitions.sh to move partitions to online brokers.
 
 **Batch Compression**
 
