@@ -74,25 +74,34 @@ When you use Producer.send():
 At this point, if a message size is less then `batch.size`, the message is still in memory and not sent to the Kafka broker. When a buffer is full, the sender thread publishes the buffer to the Kafka broker and begins to refill the buffer.
 
 ![Kafka producer internals](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-producer-internals.png?raw=true)
-
-
 A common error when publishing records is setting the same key or null key for all records, which results in all records ending up in the same partition and you get an unbalanced topic.
 
-An acknowledgment (`acks`) is a signal passed between communicating processes to signify acknowledgment, i.e., receipt of the message sent. The ack-value is a producer configuration parameter in Apache Kafka and can be set to the following values:
+**Delivery semantics & Delivery guarantees**
 
+There is trade-off between latency(or throughput) and reliability(or durability). We can control this balance by choosing delivery semantics:
+* (by default) **at-most once** semantics means that when delivering messages, we are comfortable with message losses, but not with duplicates. 
+This is the weakest guarantee implemented by queue brokers
+* **at-least once** semantics means that we don't want to lose messages, but we're okay with possible duplicates
+* **exactly-once** semantics means that we want to deliver one and only one message, without wasting or duplicating something
+
+An acknowledgment (`acks`) is a signal passed between communicating processes to signify acknowledgment, i.e., receipt of the message sent. The ack-value is a producer configuration parameter in Apache Kafka and can be set to the following values:
 * acks=0 The producer never waits for an acknowledgment from the broker. No guarantee can be made that the broker has received the message. This setting provides lower latency and higher throughput at the cost of much higher risk of message loss.
 * acks=1 The producer gets an ack after the leader has received the record and respond without awaiting a full acknowledgment from all followers. The message will be lost only if the leader fails immediately after acknowledging the record, but before the followers have replicated it. This setting is the middle ground for latency, throughput, and durability. It is slower but more durable than acks=0.
 * acks=all The producer gets an ack when all in-sync replicas have received the record. The leader will wait for the full set of in-sync replicas to acknowledge the record. This means that it takes a longer time to send a message with ack value all, but it gives the strongest message durability.
+
+![Delivery semantics](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-delivery-semantics.png?raw=true)
 
  When Kafka looses data ?
 * When asks = 1 and a broker with leader replica is getting break down before record-commit
 * When asks = all and broker with leader replica fails and no in-sync replicas present to take a leadership
 
-**Consumers, consumer groups, fail-over**
+**Consumers, consumer groups**
 
 The consumer has to send requests to the brokers indicating the partitions it wants to consume. The consumer is required to specify its offset in the request 
 and receives a chunk of log beginning from the offset position from the broker. Since the consumer has control over this position, it can re-consume data if required. 
 Records remain in the log for a configurable time period which is known as the retention period. The consumer may re-consume the data as long as the data is present in the log.
+
+![Consumer internals](https://github.com/IhorHorchakov/kafka-multi-node-cluster/blob/main/img/kafka-consumer-internals.png?raw=true)
 
 In Kafka, the consumers work on a pull-based approach. This means that data is not immediately pushed onto the consumers from the brokers. The consumers have to send requests to the brokers to indicate 
 that they are ready to consume the data. A pull-based system ensures that the consumer does not get overwhelmed with messages and can fall behind and catch up when it can. 
@@ -108,7 +117,7 @@ If you have more consumers in a group than you have partitions, extra consumers 
 
 If there is a need to consume the same record from multiple consumers, it is possible as long as that consumers have different groups.
 
-_Fail-over behaviour:_
+**Fail-over behaviour**
 
 Consumers notify the Kafka broker when they have successfully processed a record, which advances the offset.
 
@@ -164,3 +173,5 @@ https://blog.developer.adobe.com/exploring-kafka-producers-internals-37411b647d0
 https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc
 
 https://docs.cloudera.com/documentation/kafka/1-4-x/topics/kafka_performance.html
+
+https://habr.com/ru/companies/sbermarket/articles/738634/#scripts
